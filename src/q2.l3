@@ -1,30 +1,75 @@
-(define append 
+#lang scheme
+(define append
   (lambda(lst1 lst2)
-      @TODO
+      (if (empty? lst2)
+        lst1
+        (append (add-last lst1 (car lst2)) (cdr lst2))))
   )
-)
+
+
+(define add-last
+  (lambda (lst ele)
+  (if (empty? lst)    ; if the list is empty
+       (cons ele '())           ; create a one-element list with `ele`
+                             ; if the list is non-empty
+         (cons (car lst)     ; cons the first element in the list
+               (add-last (cdr lst) ele))))) ; with the result of advancing the recursion
+
+
+(define map
+  (lambda (f l)
+    (if (empty? l)
+        '()
+        (cons (f (car l))
+              (map f (cdr l))))))
 
 (define reverse 
   (lambda (lst)
-        @TODO
+    (if (empty? lst)
+            lst
+            (append (reverse (cdr lst)) (cons (car lst) '()))
+            )
   )
 )
 
 (define duplicate-items
    (lambda(lst dup-count)
-      @TODO
+      (if (empty? lst)
+          '()
+          (if ( = car(dup-count) 0)
+             (duplicate-items (cdr lst) cdr(dup-count))
+              (cons (car lst) (duplicate-items(lst cons((- car(dup-count) 1) cdr(dup-count)))))
+              )
+          )
+             
    )
 )
 
 
 (define payment
   (lambda (n coins-lst)
-        @TODO
+        (if (= n 0)
+            1
+            (if (< n 0)
+                 0
+                (if (empty? coins-lst)
+                0
+                (+ (payment (- n (car coins-lst)) (cdr coins-lst)) (payment n (cdr coins-lst)))
+                
+            )
+            )
+                )
+            
   )
 )
                                
 (define compose-n
-  (lambda( f n)
-        @TODO
+  (lambda(f n)
+       (if (= n 1)
+           f
+           (compose f (compose-n f (- n 1)))
   )
-)
+))
+
+(define (compose f g)
+        (lambda (x) (f (g x))) )
