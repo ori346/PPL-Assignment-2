@@ -1,4 +1,31 @@
-#lang scheme
+
+(define empty?
+  (lambda (lst)
+      (if (eq? '() lst)
+          #t
+            #f)
+    )
+  )
+
+(define not (lambda (b)
+  (if b
+  #f
+  #t
+ )
+ )
+ )
+
+(define filter
+      (lambda (pred l)
+        (if (empty? l)
+            l
+            (if (pred (car l))
+                (cons (car l) (filter pred (cdr l)))
+                      (filter pred (cdr l))))))
+
+
+
+                 
 (define append
   (lambda(lst1 lst2)
       (if (empty? lst2)
@@ -9,11 +36,10 @@
 
 (define add-last
   (lambda (lst ele)
-  (if (empty? lst)    ; if the list is empty
-       (cons ele '())           ; create a one-element list with `ele`
-                             ; if the list is non-empty
-         (cons (car lst)     ; cons the first element in the list
-               (add-last (cdr lst) ele))))) ; with the result of advancing the recursion
+  (if (empty? lst)    
+       (cons ele '())           
+         (cons (car lst)     
+               (add-last (cdr lst) ele))))) 
 
 
 (define map
@@ -32,16 +58,36 @@
   )
 )
 
+(define dup
+   (lambda(lst dc out)
+      (if (empty? lst)
+        out
+        (if (= 0 (car dc)) 
+          (dup (cdr lst ) (cdr dc) out)
+          (dup lst (cons (- (car dc) 1) (cdr dc)) (add-last out (car lst))) 
+        )
+      )
+      )
+      )
+
+(define length
+  (lambda (lst)
+    (if (empty? lst)
+        0
+        (+ 1 (length (cdr lst))))))
+
+(define make-longer 
+  (lambda (l1 l2) 
+    (if (< (length l1) (length l2))
+    l2
+    (make-longer l1 (append l2 l2))
+    )
+)
+)
+
 (define duplicate-items
    (lambda(lst dup-count)
-      (if (empty? lst)
-          '()
-          (if ( = car(dup-count) 0)
-             (duplicate-items (cdr lst) cdr(dup-count))
-              (cons (car lst) (duplicate-items(lst cons((- car(dup-count) 1) cdr(dup-count)))))
-              )
-          )
-             
+      (dup lst (make-longer lst dup-count) '())       
    )
 )
 
@@ -54,7 +100,8 @@
                  0
                 (if (empty? coins-lst)
                 0
-                (+ (payment (- n (car coins-lst)) (cdr coins-lst)) (payment n (cdr coins-lst)))
+                (+ (payment (- n (car coins-lst)) (cdr coins-lst)) 
+                (payment n (filter (lambda (x) (not(= x (car coins-lst)))) coins-lst)))
                 
             )
             )
@@ -62,6 +109,10 @@
             
   )
 )
+
+
+(define compose (lambda (f g)
+        (lambda (x) (f (g x))) ))
                                
 (define compose-n
   (lambda(f n)
@@ -70,6 +121,3 @@
            (compose f (compose-n f (- n 1)))
   )
 ))
-
-(define (compose f g)
-        (lambda (x) (f (g x))) )
