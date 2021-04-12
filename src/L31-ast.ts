@@ -168,7 +168,7 @@ export const parseL31SpecialForm = (op: Sexp, params: Sexp[]): Result<CExp> =>
     op === "lambda" ? parseProcExp(first(params), rest(params)) :
     op === "let" ? parseLetExp(first(params), rest(params)) :
     op === "quote" ? parseLitExp(first(params)) :
-    op === "class" ? parseClassExp(first(params), rest(params)) : //parseClassExp2(first(params), second(params))
+    op === "class" ? parseClassExp(first(params), second(params)) : //parseClassExp2(first(params), second(params))
     makeFailure("Never");
 
 // DefineExp -> (define <varDecl> <CExp>)
@@ -209,7 +209,7 @@ const isPrimitiveOp = (x: string): boolean =>
      "number?", "boolean?", "symbol?", "string?"].includes(x);
 
 const isSpecialForm = (x: string): boolean =>
-    ["if", "lambda", "let", "quote"].includes(x);
+    ["if", "lambda", "let", "quote","class"].includes(x);
 
 const parseAppExp = (op: Sexp, params: Sexp[]): Result<AppExp> =>
     safe2((rator: CExp, rands: CExp[]) => makeOk(makeAppExp(rator, rands)))
@@ -230,10 +230,11 @@ const isGoodBindings = (bindings: Sexp): bindings is [string, Sexp][] =>
     allT(isArray, bindings) &&
     allT(isIdentifier, map(first, bindings));
     
-    const isGoodClassBindings = (bindings: Sexp[]): bindings is [string, Sexp][] =>
+    const isGoodClassBindings = (bindings: Sexp): bindings is [string, Sexp][] =>
+    isArray(bindings) &&
     allT(isArray, bindings) &&
     allT(isIdentifier, map(first, bindings));
-    //TODO: maybe add check to see if the secound argument is lambda 
+    
 
 
 const isGoodClassBindings2 = (bindings: Sexp[]): bindings is [string, Sexp][] =>
@@ -241,7 +242,7 @@ const isGoodClassBindings2 = (bindings: Sexp[]): bindings is [string, Sexp][] =>
     isArray(bindings[0]) &&
     allT(isArray, bindings[0]) &&
     allT(isIdentifier, map(first, bindings[0]));
-    //TODO: maybe add check to see if the secound argument is lambda 
+     
 
 const parseLetExp = (bindings: Sexp, body: Sexp[]): Result<LetExp> => {
     if (!isGoodBindings(bindings)) {
@@ -254,19 +255,20 @@ const parseLetExp = (bindings: Sexp, body: Sexp[]): Result<LetExp> => {
         (bindingsResult, mapResult(parseL31CExp, body));
 }
 
-export const parseClassExp = (fields:Sexp,methods:Sexp[]): Result<ClassExp> =>{
+export const parseClassExp = (fields:Sexp,methods:Sexp): Result<ClassExp> =>{
     if(!isArray(fields) || !allT(isString, fields)){
     return makeFailure("bad fileds Failure");
     }
     if(!isGoodClassBindings(methods)){
     return makeFailure("bad methods Failure");
     }
-
+    
     const vars = map(b => b[0], methods);
     const valsResult = mapResult(binding => parseL31CExp(second(binding)), methods);
     const bindingsResult = bind(valsResult, (vals: CExp[]) => makeOk(zipWith(makeBinding, vars, vals)));
     return bind(bindingsResult,(functions:Binding[])=>makeOk(makeClassExp(map(makeVarDecl,fields),functions)));
 
+    //(class (a b) ((first (lambda () a)) (second (lambda () b)) (sum (lambda () (+ a b)))))`
 
 }
 
