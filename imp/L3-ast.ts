@@ -299,6 +299,3 @@ export const unparseL3 = (exp: Program | Exp): string =>
     isProgram(exp) ? `(L3 ${unparseLExps(exp.exps)})` :
     exp;
 
-    let bb:AppExp = makeAppExp(makePrimOp("+"),[makePrimOp('1') , makePrimOp('2') ,makePrimOp('3') ])
-    //let aa:IfExp = makeIfExp(makeBoolExp(true) , makeNumExp(2), makeNumExp(3))
-    //console.log(unparseL3(aa))
