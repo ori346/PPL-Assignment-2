@@ -29,6 +29,7 @@ const rewriteClass = (exp: ClassExp): ProcExp =>{
     return makeProcExp(exp.fields,[makeProcExp([makeVarDecl("msg")],[methods_to_if(names,bodies)])])
 }
 
+//crateing nested if expretions 
 const methods_to_if = (names:VarDecl[],bodies:CExp[]):IfExp|BoolExp=>{
     if(names.length==0){return makeBoolExp( false)}
     return makeIfExp(makeAppExp(makePrimOp("eq?"),
@@ -56,6 +57,7 @@ const L31ToL3_exp = (exp: Exp ): Exp =>{
     }
 }
 
+//convert l31 exp to l3
 const L31ToL3_cexp = (exp: CExp ): CExp =>{
     return isBoolExp(exp) ? exp :
     isNumExp(exp) ? exp :
@@ -71,6 +73,7 @@ const L31ToL3_cexp = (exp: CExp ): CExp =>{
     exp
 }
 
+//converting let to l3 from l31
 const L31ToL3_let = (exp: LetExp ): LetExp =>{
     const vars = map((b=>b.var.var),exp.bindings);
     const vals = map(L31ToL3_cexp,map((b=>b.val),exp.bindings));
@@ -78,26 +81,3 @@ const L31ToL3_let = (exp: LetExp ): LetExp =>{
     const bindings = (zipWith(makeBinding, vars, vals));
     return makeLetExp(bindings,bodies);
 }
-
-
-// isDefineExp(exp) ? `(define ${exp.var.var} ${unparseL31(exp.val)})` :
-// isProgram(exp) ? `(L31 ${unparseLExps(exp.exps)})` :
-
-
-
-// const rewriteIf = (exp: IfExp): CondExp =>
-//     makeCondExp([
-//         makeCondClause(exp.test, [exp.then]),
-//         makeCondClause(makeBoolExp(true), [exp.alt])
-//     ]);
-
-// const parseLetExp = (bindings: Sexp, body: Sexp[]): Result<LetExp> => {
-//     if (!isGoodBindings(bindings)) {
-//         return makeFailure('Malformed bindings in "let" expression');
-//     }
-//     const vars = map(b => b[0], bindings);
-//     const valsResult = mapResult(binding => parseL31CExp(second(binding)), bindings);
-//     const bindingsResult = bind(valsResult, (vals: CExp[]) => makeOk(zipWith(makeBinding, vars, vals)));
-//     return safe2((bindings: Binding[], body: CExp[]) => makeOk(makeLetExp(bindings, body)))
-//         (bindingsResult, mapResult(parseL31CExp, body));
-// }
