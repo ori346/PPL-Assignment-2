@@ -23,7 +23,7 @@ Signature: l31ToL3(l31AST)
 Type: [Exp | Program] => Result<Exp | Program>
 */
 
-const rewriteClass = (exp: ClassExp): ProcExp =>{
+const class2proc = (exp: ClassExp): ProcExp =>{
     const names = map((b:Binding)=>b.var, exp.methods);
     const bodies = map((b:Binding)=>b.val, exp.methods);
     return makeProcExp(exp.fields,[makeProcExp([makeVarDecl("msg")],[methods_to_if(names,bodies)])])
@@ -69,7 +69,7 @@ const L31ToL3_cexp = (exp: CExp ): CExp =>{
     isAppExp(exp) ? makeAppExp(L31ToL3_cexp(exp.rator),map(L31ToL3_cexp,exp.rands)) :
     isPrimOp(exp) ? exp :
     isLetExp(exp) ? L31ToL3_let(exp) :
-    isClassExp(exp)? rewriteClass(exp):
+    isClassExp(exp)? class2proc(exp):
     exp
 }
 

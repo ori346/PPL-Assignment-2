@@ -233,15 +233,9 @@ const isGoodBindings = (bindings: Sexp): bindings is [string, Sexp][] =>
     const isGoodClassBindings = (bindings: Sexp): bindings is [string, Sexp][] =>
     isArray(bindings) &&
     allT(isArray, bindings) &&
-    allT(isIdentifier, map(first, bindings));
+    allT(isIdentifier, map(first, bindings))&&
+    allT(isArray, map(second, bindings));
     
-
-
-const isGoodClassBindings2 = (bindings: Sexp[]): bindings is [string, Sexp][] =>
-    bindings.length==1 &&
-    isArray(bindings[0]) &&
-    allT(isArray, bindings[0]) &&
-    allT(isIdentifier, map(first, bindings[0]));
      
 
 const parseLetExp = (bindings: Sexp, body: Sexp[]): Result<LetExp> => {
@@ -267,8 +261,6 @@ export const parseClassExp = (fields:Sexp,methods:Sexp): Result<ClassExp> =>{
     const valsResult = mapResult(binding => parseL31CExp(second(binding)), methods);
     const bindingsResult = bind(valsResult, (vals: CExp[]) => makeOk(zipWith(makeBinding, vars, vals)));
     return bind(bindingsResult,(functions:Binding[])=>makeOk(makeClassExp(map(makeVarDecl,fields),functions)));
-
-    //(class (a b) ((first (lambda () a)) (second (lambda () b)) (sum (lambda () (+ a b)))))`
 
 }
 
